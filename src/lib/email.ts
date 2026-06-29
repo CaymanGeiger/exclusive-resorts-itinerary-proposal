@@ -1,5 +1,6 @@
 import type { ProposalDetail } from "@/lib/types";
 import { dateRange, dateTime, money } from "@/lib/format";
+import { proposalUrl } from "@/lib/proposal-link";
 
 type ResendEmailPayload = {
   from: string;
@@ -41,7 +42,7 @@ function getSender() {
 
 function getProposalUrl(proposal: ProposalDetail, requestOrigin?: string) {
   const baseUrl = requestOrigin ?? process.env.PROPOSAL_BASE_URL ?? "http://localhost:3015";
-  return new URL(`/proposal/${proposal.id}`, baseUrl).toString();
+  return proposalUrl(proposal, baseUrl);
 }
 
 function getRecipient(proposal: ProposalDetail) {

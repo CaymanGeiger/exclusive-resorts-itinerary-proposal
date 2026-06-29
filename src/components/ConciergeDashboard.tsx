@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { CATEGORIES, defaultsFor } from "@/lib/categories";
 import { dateRange, dateTime, money } from "@/lib/format";
+import { proposalHref } from "@/lib/proposal-link";
 import type {
   ItineraryCategory,
   ProposalDetail,
@@ -373,7 +374,7 @@ export function ConciergeDashboard({
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <span>{error ?? message}</span>
               {lastProposal ? (
-                <Link href={`/proposal/${lastProposal.id}`} className="inline-flex items-center gap-2 font-semibold">
+                <Link href={proposalHref(lastProposal)} className="inline-flex items-center gap-2 font-semibold">
                   Open member view <ExternalLink className="h-4 w-4" />
                 </Link>
               ) : null}

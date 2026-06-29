@@ -24,6 +24,12 @@ so serverless functions can write to it on the free plan. That is appropriate fo
 an assessment demo, but it is not durable production storage. A production version
 should use a hosted database such as Turso or Neon.
 
+Because Vercel can split pages and API routes across separate function instances,
+member-facing proposal links also include a compact proposal snapshot query
+parameter. That keeps emailed/demo links reliable on the free plan without
+accepting a marketplace database contract. In production, I would replace that
+snapshot fallback with durable hosted storage and signed member access.
+
 ## What It Does
 
 - Concierge dashboard at `/`

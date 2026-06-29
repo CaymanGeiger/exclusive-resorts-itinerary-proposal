@@ -13,6 +13,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { date, dateRange, dateTime, groupByDay, money, time } from "@/lib/format";
+import { decodeProposalSnapshot, proposalSnapshotParam } from "@/lib/proposal-link";
 import type { ProposalDetail, ProposalStatus } from "@/lib/types";
 
 const statusClass: Record<ProposalStatus, string> = {
@@ -35,14 +36,20 @@ export function MemberProposal({
   proposalId: string;
   initialProposal: ProposalDetail | null;
 }) {
-  const [proposal, setProposal] = useState(initialProposal);
-  const [loading, setLoading] = useState(!initialProposal);
+  const [snapshotProposal] = useState(() => {
+    if (initialProposal || typeof window === "undefined") return null;
+    return decodeProposalSnapshot(
+      new URLSearchParams(window.location.search).get(proposalSnapshotParam()),
+    );
+  });
+  const [proposal, setProposal] = useState(initialProposal ?? snapshotProposal);
+  const [loading, setLoading] = useState(!initialProposal && !snapshotProposal);
   const [busy, setBusy] = useState<ProposalStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastAction, setLastAction] = useState<ProposalStatus | null>(null);
 
   useEffect(() => {
-    if (initialProposal) return;
+    if (initialProposal || snapshotProposal) return;
     let active = true;
 
     async function loadProposal() {
@@ -66,7 +73,7 @@ export function MemberProposal({
     return () => {
       active = false;
     };
-  }, [initialProposal, proposalId]);
+  }, [initialProposal, proposalId, snapshotProposal]);
 
   const grouped = useMemo(() => {
     if (!proposal) return [];
