@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   CalendarDays,
@@ -36,9 +36,37 @@ export function MemberProposal({
   initialProposal: ProposalDetail | null;
 }) {
   const [proposal, setProposal] = useState(initialProposal);
+  const [loading, setLoading] = useState(!initialProposal);
   const [busy, setBusy] = useState<ProposalStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastAction, setLastAction] = useState<ProposalStatus | null>(null);
+
+  useEffect(() => {
+    if (initialProposal) return;
+    let active = true;
+
+    async function loadProposal() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await readJson<{ proposal: ProposalDetail }>(
+          await fetch(`/api/proposals/${proposalId}`),
+        );
+        if (active) setProposal(data.proposal);
+      } catch (caught) {
+        if (active) {
+          setError(caught instanceof Error ? caught.message : "Unable to load proposal.");
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    void loadProposal();
+    return () => {
+      active = false;
+    };
+  }, [initialProposal, proposalId]);
 
   const grouped = useMemo(() => {
     if (!proposal) return [];
@@ -79,8 +107,14 @@ export function MemberProposal({
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#f5f7f2] px-5">
         <section className="max-w-md border border-[#dfe5dd] bg-white p-8 text-center">
-          <h1 className="text-2xl font-semibold text-[#17344a]">Proposal unavailable</h1>
-          <p className="mt-3 text-sm text-[#69746e]">This proposal could not be found.</p>
+          <h1 className="text-2xl font-semibold text-[#17344a]">
+            {loading ? "Loading proposal" : "Proposal unavailable"}
+          </h1>
+          <p className="mt-3 text-sm text-[#69746e]">
+            {loading
+              ? "Preparing your itinerary view."
+              : error ?? "This proposal could not be found."}
+          </p>
           <Link
             href="/"
             className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-md bg-[#17344a] px-4 text-sm font-semibold text-white"
