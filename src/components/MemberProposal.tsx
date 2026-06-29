@@ -36,26 +36,28 @@ export function MemberProposal({
   proposalId: string;
   initialProposal: ProposalDetail | null;
 }) {
-  const [snapshotProposal] = useState(() => {
-    if (initialProposal || typeof window === "undefined") return null;
-    return decodeProposalSnapshot(
-      new URLSearchParams(window.location.search).get(proposalSnapshotParam()),
-    );
-  });
-  const [proposal, setProposal] = useState(initialProposal ?? snapshotProposal);
-  const [loading, setLoading] = useState(!initialProposal && !snapshotProposal);
+  const [proposal, setProposal] = useState(initialProposal);
+  const [loading, setLoading] = useState(!initialProposal);
   const [busy, setBusy] = useState<ProposalStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastAction, setLastAction] = useState<ProposalStatus | null>(null);
 
   useEffect(() => {
-    if (initialProposal || snapshotProposal) return;
+    if (initialProposal) return;
     let active = true;
 
     async function loadProposal() {
       setLoading(true);
       setError(null);
       try {
+        const snapshot = decodeProposalSnapshot(
+          new URLSearchParams(window.location.search).get(proposalSnapshotParam()),
+        );
+        if (snapshot) {
+          if (active) setProposal(snapshot);
+          return;
+        }
+
         const data = await readJson<{ proposal: ProposalDetail }>(
           await fetch(`/api/proposals/${proposalId}`),
         );
@@ -73,7 +75,7 @@ export function MemberProposal({
     return () => {
       active = false;
     };
-  }, [initialProposal, proposalId, snapshotProposal]);
+  }, [initialProposal, proposalId]);
 
   const grouped = useMemo(() => {
     if (!proposal) return [];
