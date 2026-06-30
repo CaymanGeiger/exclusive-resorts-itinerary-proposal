@@ -40,8 +40,24 @@ function getSender() {
   );
 }
 
+function urlWithProtocol(value: string | undefined) {
+  const trimmed = value?.trim();
+  if (!trimmed) return null;
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
 function getProposalUrl(proposal: ProposalDetail, requestOrigin?: string) {
-  const baseUrl = requestOrigin ?? process.env.PROPOSAL_BASE_URL ?? "http://localhost:3015";
+  const productionBaseUrl = urlWithProtocol(process.env.VERCEL_PROJECT_PRODUCTION_URL);
+  const configuredBaseUrl = urlWithProtocol(process.env.PROPOSAL_BASE_URL);
+  const deploymentBaseUrl = urlWithProtocol(process.env.VERCEL_URL);
+  const isProduction = process.env.VERCEL_ENV === "production";
+  const baseUrl =
+    (isProduction ? productionBaseUrl : null) ??
+    configuredBaseUrl ??
+    requestOrigin ??
+    deploymentBaseUrl ??
+    "http://localhost:3015";
+
   return proposalUrl(proposal, baseUrl);
 }
 

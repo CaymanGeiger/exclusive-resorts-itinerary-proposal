@@ -35,7 +35,7 @@ snapshot fallback with durable hosted storage and signed member access.
 - Concierge dashboard at `/`
   - Shows the active member reservation context.
   - Supports switching between seeded members/reservations.
-  - Builds itinerary line items from the required categories.
+  - Builds itinerary experiences from the required categories.
   - Shows a live proposal preview and estimated total.
   - Saves drafts, reloads draft proposals for editing, and sends the edited draft.
   - Sending marks the proposal as `sent` and writes a row to `sent_emails`.
@@ -44,7 +44,7 @@ snapshot fallback with durable hosted storage and signed member access.
 - Member experience at `/proposal/[id]`
   - Presents the itinerary with a premium Punta Mita visual treatment.
   - Renders the concierge note/message.
-  - Groups line items into a day-by-day timeline.
+  - Groups experiences into a day-by-day timeline.
   - Shows pricing and total cost clearly.
   - Optimistically updates approval and payment status.
   - Shows animated confirmation states after approval and payment.
@@ -114,7 +114,7 @@ For a 5-10 minute Loom:
 
 1. Start on the concierge dashboard and point out the seeded reservation context.
 2. Switch reservations to show the multi-member stretch workflow.
-3. Add one or more itinerary items from different categories.
+3. Add one or more experiences from different categories.
 4. Save a draft, reopen it from the ledger, edit it, and send it.
 5. Show the preview total and concierge note.
 6. Open the member proposal link.

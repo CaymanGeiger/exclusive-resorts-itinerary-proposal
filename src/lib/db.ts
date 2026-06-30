@@ -2,7 +2,6 @@ import Database from "better-sqlite3";
 import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type {
-  ItineraryCategory,
   ProposalDetail,
   ProposalDraftInput,
   ProposalItem,
@@ -401,7 +400,11 @@ export function sendProposal(id: number): ProposalMutationResult {
   if (result.error || !result.proposal) return result;
   const proposal = result.proposal;
 
-  const bodyPreview = `${proposal.member.name}, your ${proposal.reservation.villa} proposal is ready with ${proposal.items.length} curated items totaling $${proposal.total.toLocaleString("en-US")}.`;
+  const bodyPreview = [
+    `${proposal.member.name}, your ${proposal.reservation.villa} proposal is ready`,
+    `with ${proposal.items.length} curated items totaling`,
+    `$${proposal.total.toLocaleString("en-US")}.`,
+  ].join(" ");
   getDb()
     .prepare(
       "INSERT INTO sent_emails (proposal_id, to_email, body_preview) VALUES (?, ?, ?)",
@@ -413,18 +416,4 @@ export function sendProposal(id: number): ProposalMutationResult {
 
 export function validStatus(value: unknown): value is ProposalStatus {
   return value === "sent" || value === "approved" || value === "paid";
-}
-
-export function parseCategory(value: unknown): ItineraryCategory | null {
-  const categories: ItineraryCategory[] = [
-    "Dining",
-    "Activities",
-    "Wellness",
-    "Excursions",
-    "Transport",
-    "Experiences",
-  ];
-  return typeof value === "string" && categories.includes(value as ItineraryCategory)
-    ? (value as ItineraryCategory)
-    : null;
 }
